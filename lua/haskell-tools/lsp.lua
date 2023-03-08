@@ -101,7 +101,7 @@ function lsp.setup()
   assert(#cmd > 1, 'haskell-tools: hls cmd table is empty.')
   local hls_cmd = cmd[1]
   if vim.fn.executable(hls_cmd) == 0 then
-    ht.log.warn('Command ' .. hls_cmd .. ' not found in PATH.')
+    ht.log.error('Command ' .. hls_cmd .. ' not found in PATH.')
     return
   end
 
@@ -128,6 +128,7 @@ function lsp.setup()
   ---@param bufnr number|nil The buffer number (optional), defaults to the current buffer
   ---@return number|nil client_id The LSP client ID
   function lsp.start(bufnr)
+    ht.log.info('lsp.start: starting LSP server...')
     bufnr = bufnr or vim.api.nvim_get_current_buf()
     local file = vim.api.nvim_buf_get_name(bufnr)
     if not file or #file == 0 then
@@ -144,8 +145,10 @@ function lsp.setup()
       return
     end
     local project_root = ht.project.root_dir(file)
+    ht.log.info('lsp.start: project_root:', project_root)
     local hls_settings = type(hls_opts.settings) == 'function' and hls_opts.settings(project_root) or hls_opts.settings
-    local client_id = vim.lsp.start {
+    ht.log.info('lsp.start: calling vim.lsp.start with cmd:', cmd)
+    local final_opts = {
       name = lsp_util.client_name,
       cmd = cmd,
       root_dir = project_root,
@@ -176,6 +179,8 @@ function lsp.setup()
         end
       end,
     }
+    -- print(vim.inspect(final_opts))
+    local client_id = vim.lsp.start(final_opts)
     if client_id then
       ensure_clean_exit_on_quit(client_id, bufnr)
     end

@@ -68,6 +68,7 @@ function ht.start_or_attach(opts)
   if not _state._has_been_setup then
     ht.setup(opts)
   end
+  ht.log.info('START_OR_ATTACH CALLED')
   ht.lsp.start()
   if ht.config.options.tools.tags.enable then
     ht.tags.generate_project_tags(nil, { refresh = false })
@@ -97,10 +98,12 @@ end
 --- }
 ---@usage ]]
 function ht.setup(opts)
+  -- print("SETUP")
   local config = require('haskell-tools.config')
   ht.config = config
   local log = require('haskell-tools.log')
   ht.log = log
+  -- ht.log.debug('START_OR_ATTACH CALLED')
   local lsp = require('haskell-tools.lsp')
   ht.lsp = lsp
   local hoogle = require('haskell-tools.hoogle')
